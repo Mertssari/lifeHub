@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="128" fill="#172b2a"/>
+  <rect x="70" y="70" width="372" height="372" rx="70" fill="#203d37" stroke="#35a574" stroke-width="8"/>
+  <circle cx="256" cy="210" r="70" fill="#b9e8d2"/>
+  <text x="256" y="235" font-family="'Space Grotesk', system-ui, sans-serif" font-size="90" font-weight="800" font-style="italic" fill="#172b2a" text-anchor="middle">d</text>
+  <text x="256" y="360" font-family="'Space Grotesk', system-ui, sans-serif" font-size="52" font-weight="700" fill="#f7f4ec" text-anchor="middle" letter-spacing="4">DERSLİK</text>
+  <circle cx="390" cy="120" r="16" fill="#f2c66d"/>
+</svg>

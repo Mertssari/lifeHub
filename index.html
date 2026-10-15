@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#172b2a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Derslik">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="manifest" href="manifest.json">
+  <title>Derslik | Günlük Ajanda, Notlar & Pomodoro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Üst Menü / Topbar -->
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Derslik ana sayfa">
+        <span class="brand-mark">d</span>
+        <span>derslik</span>
+      </a>
+
+      <!-- Masaüstü Sekme Butonları -->
+      <nav class="desktop-nav" aria-label="Ana Gezinti">
+        <button class="nav-btn active" data-tab="planner">
+          <span class="nav-icon">📅</span> Planım
+        </button>
+        <button class="nav-btn" data-tab="notes">
+          <span class="nav-icon">📝</span> Not Defterim
+          <span class="badge" id="notesBadge">0</span>
+        </button>
+        <button class="nav-btn" data-tab="pomodoro">
+          <span class="nav-icon">⏱️</span> Odak Sayacı
+        </button>
+      </nav>
+
+      <div class="topbar-right">
+        <div class="topbar-date" id="topbarDate">
+          <span class="pulse-dot"></span>
+          <span id="todayLabel">Bu haftanın planı</span>
+        </div>
+        <button class="icon-button" id="openBackupButton" title="Verileri Yedekle / Cihazlar Arası Aktar" aria-label="Verileri Yedekle ve Aktar">
+          ⇄
+        </button>
+        <button class="icon-button" id="clearAllButton" title="Tüm planı temizle" aria-label="Tüm planı temizle">
+          ⌫
+        </button>
+      </div>
+    </header>
+
+    <!-- Ana İçerik -->
+    <main class="main-content">
+      
+      <!-- ================= SEKME 1: HAFTALIK VE GÜNLÜK PLANLAYICI ================= -->
+      <div class="tab-pane active" id="panePlanner">
+        <section class="intro-row">
+          <div>
+            <p class="eyebrow">GÜNLÜK AJANDA & DERS PLANI</p>
+            <h1>Bu hafta ne<br><em>çalışıyoruz?</em></h1>
+            <p class="intro-copy">Derslerini ve görevlerini planla, notlarını al.<br>Sürükle-bırak ile taşı, ilerlemeni anlık gör.</p>
+          </div>
+          <div class="summary-card">
+            <div class="summary-top">
+              <span>HAFTALIK İLERLEME</span>
+              <span class="summary-icon">✦</span>
+            </div>
+            <strong id="lessonCount">0 görev</strong>
+            <div class="progress-track"><span id="progressBar"></span></div>
+            <p><span id="completedCount">0</span> tamamlandı (<span id="progressPercent">0%</span>)</p>
+          </div>
+        </section>
+
+        <!-- Mobil Gün Seçici Filtre (Mobilde tek tıkla güne odaklanma) -->
+        <div class="mobile-day-filter" id="mobileDayFilter">
+          <button class="day-chip active" data-day="all">Tüm Hafta</button>
+          <button class="day-chip" data-day="pazartesi">Pzt</button>
+          <button class="day-chip" data-day="sali">Sal</button>
+          <button class="day-chip" data-day="carsamba">Çar</button>
+          <button class="day-chip" data-day="persembe">Per</button>
+          <button class="day-chip" data-day="cuma">Cum</button>
+          <button class="day-chip" data-day="cumartesi">Cmt</button>
+          <button class="day-chip" data-day="pazar">Paz</button>
+        </div>
+
+        <section class="planner-section">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">HAFTALIK AKIŞ</p>
+              <h2>Ders ve Görev Çizelgesi</h2>
+            </div>
+            <button class="add-button" id="openAddButton">
+              <span>+</span> Görev / Ders Ekle
+            </button>
+          </div>
+
+          <div class="week-grid" id="weekGrid">
+            <!-- JavaScript ile doldurulacak -->
+          </div>
+        </section>
+
+        <section class="legend-row" aria-label="Kategoriler ve Zorluk">
+          <div class="legend-group">
+            <span class="legend-title">ÖNCELİK</span>
+            <span><i class="legend-dot easy"></i> Kolay / Normal</span>
+            <span><i class="legend-dot medium"></i> Orta</span>
+            <span><i class="legend-dot hard"></i> Yüksek / Zor</span>
+          </div>
+          <span class="tip">💡 Kartları fare veya parmağınızla günler arasında sürükleyip taşıyabilirsiniz.</span>
+        </section>
+      </div>
+
+      <!-- ================= SEKME 2: SERBEST NOT DEFTERİ ================= -->
+      <div class="tab-pane" id="paneNotes">
+        <section class="intro-row">
+          <div>
+            <p class="eyebrow">SERBEST NOT DEFTERİ</p>
+            <h1>Aklındakileri<br><em>not al.</em></h1>
+            <p class="intro-copy">Fikirlerini, formüllerini, yapılacak günlük maddeleri<br>renkli not kartlarıyla anında kaydet.</p>
+          </div>
+          <div class="notes-actions">
+            <button class="add-button" id="openAddNoteButton">
+              <span>+</span> Yeni Not Yaz
+            </button>
+          </div>
+        </section>
+
+        <!-- Arama ve Filtre -->
+        <div class="notes-toolbar">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="noteSearchInput" placeholder="Notlarda ara (başlık, içerik)...">
+          </div>
+          <div class="notes-count-tag" id="notesCounter">0 not kayıtlı</div>
+        </div>
+
+        <!-- Notlar Listesi Grid -->
+        <div class="notes-grid" id="notesGrid">
+          <!-- JavaScript ile doldurulacak -->
+        </div>
+      </div>
+
+      <!-- ================= SEKME 3: POMODORO ODAK SAYACI ================= -->
+      <div class="tab-pane" id="panePomodoro">
+        <section class="pomodoro-container">
+          <p class="eyebrow">VERİMLİLİK ARACI</p>
+          <h1>Odaklanma <em>Zamanı</em></h1>
+          <p class="intro-copy">25 dakika tam odaklan, ardından 5 dakika mola ver.</p>
+
+          <div class="pomodoro-card">
+            <!-- Mod Seçiciler -->
+            <div class="pomodoro-modes">
+              <button class="pomo-mode-btn active" data-mode="work" data-time="25">Odaklan (25 dk)</button>
+              <button class="pomo-mode-btn" data-mode="short" data-time="5">Kısa Mola (5 dk)</button>
+              <button class="pomo-mode-btn" data-mode="long" data-time="15">Uzun Mola (15 dk)</button>
+            </div>
+
+            <!-- Odak Görevi Seçici -->
+            <div class="active-task-selector">
+              <label for="pomoTaskSelect">Çalışılan Görev / Ders:</label>
+              <select id="pomoTaskSelect">
+                <option value="">-- Serbest Çalışma --</option>
+              </select>
+            </div>
+
+            <!-- Sayaç Göstergesi -->
+            <div class="timer-display-wrap">
+              <svg class="timer-ring" viewBox="0 0 240 240">
+                <circle class="ring-bg" cx="120" cy="120" r="100"></circle>
+                <circle class="ring-progress" id="timerProgress" cx="120" cy="120" r="100"></circle>
+              </svg>
+              <div class="timer-inner">
+                <div class="timer-digits" id="timerDigits">25:00</div>
+                <div class="timer-status" id="timerStatusLabel">Odak Seansı</div>
+              </div>
+            </div>
+
+            <!-- Kontroller -->
+            <div class="timer-controls">
+              <button class="timer-btn primary" id="timerToggleBtn">Başlat</button>
+              <button class="timer-btn secondary" id="timerResetBtn">Sıfırla</button>
+            </div>
+
+            <div class="pomo-stats">
+              <span>Tamamlanan Seanslar: <strong id="pomoSessionsCount">0</strong> 🍅</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+    </main>
+
+    <!-- ================= MOBİL ALT GEZİNME ÇUBUĞU (BOTTOM NAV) ================= -->
+    <nav class="mobile-bottom-nav" aria-label="Mobil Gezinme">
+      <button class="bottom-nav-item active" data-tab="planner">
+        <span class="b-icon">📅</span>
+        <span class="b-label">Planım</span>
+      </button>
+      <button class="bottom-nav-item" data-tab="notes">
+        <span class="b-icon">📝</span>
+        <span class="b-label">Notlar</span>
+      </button>
+      <button class="bottom-nav-item" data-tab="pomodoro">
+        <span class="b-icon">⏱️</span>
+        <span class="b-label">Pomodoro</span>
+      </button>
+      <button class="bottom-nav-item" id="mobileBackupTrigger">
+        <span class="b-icon">⇄</span>
+        <span class="b-label">Aktar</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ================= MODAL 1: GÖREV / DERS EKLE & DÜZENLE ================= -->
+  <dialog id="lessonDialog" class="dialog">
+    <form method="dialog" id="lessonForm" class="dialog-card">
+      <button class="close-button" type="button" id="closeDialogButton" aria-label="Kapat">×</button>
+      <p class="eyebrow" id="formEyebrow">YENİ PLAN</p>
+      <h2 id="formTitle">Ders veya Görev Ekle</h2>
+      <p class="dialog-subtitle">Günün ritmine uygun bir hedef veya ders belirle.</p>
+      
+      <input type="hidden" id="editingLessonId" value="">
+
+      <label>Başlık / Ders Adı
+        <input id="lessonName" type="text" placeholder="Örn. Matematik, Fizik Soru Çözümü..." required maxlength="48">
+      </label>
+
+      <div class="form-row">
+        <label>Kategori
+          <select id="lessonCategory">
+            <option value="ders">📚 Ders</option>
+            <option value="odev">✏️ Ödev / Proje</option>
+            <option value="gorev">✅ Günlük Görev</option>
+            <option value="sinav">🎯 Sınav / Deneme</option>
+            <option value="diger">💡 Diğer</option>
+          </select>
+        </label>
+        <label>Gün
+          <select id="lessonDay" required>
+            <option value="pazartesi">Pazartesi</option>
+            <option value="sali">Salı</option>
+            <option value="carsamba">Çarşamba</option>
+            <option value="persembe">Perşembe</option>
+            <option value="cuma">Cuma</option>
+            <option value="cumartesi">Cumartesi</option>
+            <option value="pazar">Pazar</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="form-row">
+        <label>Saat
+          <input id="lessonTime" type="time" value="18:00" required>
+        </label>
+        <fieldset class="difficulty-fieldset">
+          <legend>Öncelik / Zorluk</legend>
+          <div class="difficulty-options">
+            <label>
+              <input type="radio" name="difficulty" value="easy" checked>
+              <span class="difficulty-choice easy-choice">Kolay</span>
+            </label>
+            <label>
+              <input type="radio" name="difficulty" value="medium">
+              <span class="difficulty-choice medium-choice">Orta</span>
+            </label>
+            <label>
+              <input type="radio" name="difficulty" value="hard">
+              <span class="difficulty-choice hard-choice">Zor</span>
+            </label>
+          </div>
+        </fieldset>
+      </div>
+
+      <label class="notes-label">Detaylı Notlar & Hedefler
+        <textarea id="lessonNotesInput" rows="3" placeholder="Örn: 50 soru çözülecek, sayfa 120-145 okunacak..."></textarea>
+      </label>
+
+      <button class="submit-button" type="submit" id="submitLessonBtn">
+        Kaydet <span>→</span>
+      </button>
+    </form>
+  </dialog>
+
+  <!-- ================= MODAL 2: GÖREV DETAY & HIZLI İŞLEM ================= -->
+  <dialog id="detailDialog" class="dialog">
+    <form method="dialog" id="detailForm" class="dialog-card detail-card">
+      <button class="close-button" type="button" id="closeDetailButton" aria-label="Kapat">×</button>
+      
+      <div class="detail-header">
+        <span class="detail-symbol" id="detailCategoryIcon">✦</span>
+        <div>
+          <p class="eyebrow" id="detailDay">PAZARTESİ · 18:00</p>
+          <h2 id="detailName">Matematik</h2>
+        </div>
+      </div>
+
+      <div class="detail-meta">
+        <span id="detailDifficulty" class="difficulty-badge">Kolay</span>
+        <label class="check-label">
+          <input id="detailCompleted" type="checkbox"> Tamamlandı
+        </label>
+      </div>
+
+      <!-- Hızlı Gün Taşıyıcı (Özellikle mobilde parmakla tek tıkla güne aktarma) -->
+      <div class="move-day-box">
+        <label for="detailMoveDay">Günü Değiştir / Taşı:</label>
+        <select id="detailMoveDay">
+          <option value="pazartesi">Pazartesi</option>
+          <option value="sali">Salı</option>
+          <option value="carsamba">Çarşamba</option>
+          <option value="persembe">Perşembe</option>
+          <option value="cuma">Cuma</option>
+          <option value="cumartesi">Cumartesi</option>
+          <option value="pazar">Pazar</option>
+        </select>
+      </div>
+
+      <label class="notes-label">Notlar
+        <textarea id="detailNotes" rows="4" placeholder="Bu derste ne çalışacağını, aklına gelenleri yaz..."></textarea>
+      </label>
+
+      <div class="detail-extra-actions">
+        <button type="button" class="action-pill-btn" id="detailStartPomoBtn">
+          ⏱️ Bu Görev İçin Pomodoro Başlat
+        </button>
+      </div>
+
+      <div class="detail-actions">
+        <button class="delete-button" type="button" id="deleteLessonButton">Sil</button>
+        <button class="edit-btn" type="button" id="editLessonButton">Düzenle ✎</button>
+        <button class="submit-button small" type="submit">Kaydet <span>✓</span></button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- ================= MODAL 3: NOT YAZ / DÜZENLE ================= -->
+  <dialog id="noteDialog" class="dialog">
+    <form method="dialog" id="noteForm" class="dialog-card">
+      <button class="close-button" type="button" id="closeNoteButton" aria-label="Kapat">×</button>
+      <p class="eyebrow" id="noteModalEyebrow">NOT DEFTERİM</p>
+      <h2 id="noteModalTitle">Yeni Not Yaz</h2>
+      <p class="dialog-subtitle">Önemli bilgileri, hatırlatıcıları veya formülleri kaydet.</p>
+      
+      <input type="hidden" id="editingNoteId" value="">
+
+      <label>Not Başlığı
+        <input id="noteTitle" type="text" placeholder="Örn: Tarih Önemli Tarihler, Formül Kağıdı..." required maxlength="60">
+      </label>
+
+      <label class="notes-label">Not İçeriği
+        <textarea id="noteContent" rows="6" placeholder="Notlarını buraya yaz..." required></textarea>
+      </label>
+
+      <div class="note-options-row">
+        <div>
+          <label class="inline-title">Kart Rengi:</label>
+          <div class="color-picker-group">
+            <label class="color-choice mint"><input type="radio" name="noteColor" value="mint" checked><span></span></label>
+            <label class="color-choice yellow"><input type="radio" name="noteColor" value="yellow"><span></span></label>
+            <label class="color-choice coral"><input type="radio" name="noteColor" value="coral"><span></span></label>
+            <label class="color-choice lavender"><input type="radio" name="noteColor" value="lavender"><span></span></label>
+            <label class="color-choice paper"><input type="radio" name="noteColor" value="paper"><span></span></label>
+          </div>
+        </div>
+
+        <label class="check-label pin-label">
+          <input id="notePinned" type="checkbox"> 📌 Üste Sabitle
+        </label>
+      </div>
+
+      <button class="submit-button" type="submit" id="submitNoteBtn">
+        Notu Kaydet <span>→</span>
+      </button>
+    </form>
+  </dialog>
+
+  <!-- ================= MODAL 4: YEDEKLE & CİHAZLAR ARASI AKTAR (MADDE 5) ================= -->
+  <dialog id="backupDialog" class="dialog">
+    <div class="dialog-card backup-card">
+      <button class="close-button" type="button" id="closeBackupButton" aria-label="Kapat">×</button>
+      <p class="eyebrow">VERİ YÖNETİMİ & AKTARIM</p>
+      <h2>Yedekle & Cihazlar Arası Aktar</h2>
+      <p class="dialog-subtitle">Bilgisayar ve telefon arasında planlarını ve notlarını kolayca taşı.</p>
+
+      <div class="backup-sections">
+        <!-- Dosya Olarak Yedekleme -->
+        <div class="backup-box">
+          <div class="backup-box-title">
+            <span class="box-icon">📁</span>
+            <strong>Dosya İle Aktarım (Önerilen)</strong>
+          </div>
+          <p class="box-desc">Planını ve notlarını tek bir JSON dosyası olarak indir. Telefona gönderip tek dokunuşla geri yükle.</p>
+          <div class="box-actions">
+            <button class="backup-action-btn" id="exportJsonBtn">⬇️ JSON Yedeği İndir</button>
+            <label class="backup-action-btn secondary file-input-label">
+              ⬆️ JSON Yedeği Yükle
+              <input type="file" id="importJsonFileInput" accept=".json,application/json" style="display:none;">
+            </label>
+          </div>
+        </div>
+
+        <!-- Hızlı Metin Panosu İle Aktarım (WhatsApp / E-posta için) -->
+        <div class="backup-box">
+          <div class="backup-box-title">
+            <span class="box-icon">📋</span>
+            <strong>Metin / Pano İle Hızlı Taşıma</strong>
+          </div>
+          <p class="box-desc">Dosya kaydetmekle uğraşmadan, metni kopyalayıp WhatsApp veya mesajla telefonuna atarak doğrudan yapıştırabilirsin.</p>
+          <div class="box-actions">
+            <button class="backup-action-btn small" id="copyDataBtn">📋 Tüm Veriyi Kopyala</button>
+            <button class="backup-action-btn small secondary" id="pasteDataBtn">📥 Metinden Geri Yükle</button>
+          </div>
+          <textarea id="rawJsonTextarea" rows="3" placeholder="Buraya daha önce kopyaladığın veriyi yapıştırıp 'Metinden Geri Yükle'ye basabilirsin..."></textarea>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="script.js"></script>
+</body>
+</html>
