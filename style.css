@@ -176,6 +176,82 @@ button {
   transform: translateY(-1px);
 }
 
+/* Google Auth UI */
+.auth-section {
+  display: flex;
+  align-items: center;
+}
+
+.google-login-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 7px 13px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 12.5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.google-login-btn:hover {
+  background: #fbfaf5;
+  border-color: #d0cec5;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+.google-icon {
+  flex-shrink: 0;
+}
+
+.user-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: #f1ede3;
+  padding: 4px 10px 4px 5px;
+  border-radius: 24px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.user-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid var(--green);
+}
+
+.user-name {
+  max-width: 80px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.logout-btn {
+  background: transparent;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1;
+  padding: 1px 4px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.logout-btn:hover {
+  color: var(--coral);
+}
+
+
 /* ================= ANA İÇERİK ================= */
 .main-content {
   padding: 44px 6% 80px;

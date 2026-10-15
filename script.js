@@ -71,13 +71,58 @@ const lessonForm = document.querySelector('#lessonForm');
 const detailForm = document.querySelector('#detailForm');
 const noteForm = document.querySelector('#noteForm');
 
+// ================= FIREBASE BULUT SENKRONİZASYONU =================
+const firebaseConfig = {
+  apiKey: "AIzaSyCTU7HM_pOkt651p40Qf3TXmjYbkh6t6vc",
+  authDomain: "lifehub-15540.firebaseapp.com",
+  projectId: "lifehub-15540",
+  storageBucket: "lifehub-15540.firebasestorage.app",
+  messagingSenderId: "990729856057",
+  appId: "1:990729856057:web:36846550415331e7bb99e8",
+  measurementId: "G-8WEWNLQJR2"
+};
+
+let auth = null;
+let db = null;
+let currentUser = null;
+let unsubscribeFirestore = null;
+
+try {
+  if (typeof firebase !== 'undefined') {
+    firebase.initializeApp(firebaseConfig);
+    auth = firebase.auth();
+    db = firebase.firestore();
+  }
+} catch (err) {
+  console.warn('Firebase başlatılamadı:', err);
+}
+
+// Buluta Değişiklikleri Gönderme (Debounce ile)
+let syncDebounceTimer = null;
+function syncToCloud() {
+  if (!currentUser || !db) return;
+  clearTimeout(syncDebounceTimer);
+  syncDebounceTimer = setTimeout(() => {
+    db.collection('users').doc(currentUser.uid).set({
+      lessons: lessons,
+      notes: notes,
+      pomoSessions: pomoSessions,
+      lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true }).catch(err => {
+      console.warn('Buluta senkronize edilemedi:', err);
+    });
+  }, 350);
+}
+
 // ================= KAYDETME VE YARDIMCI FONKSİYONLAR =================
 function saveLessons() {
   localStorage.setItem(storageKeyLessons, JSON.stringify(lessons));
+  syncToCloud();
 }
 
 function saveNotes() {
   localStorage.setItem(storageKeyNotes, JSON.stringify(notes));
+  syncToCloud();
 }
 
 function todayId() {
@@ -703,6 +748,7 @@ timerToggleBtn.addEventListener('click', () => {
           pomoSessions++;
           localStorage.setItem(storageKeyPomo, pomoSessions.toString());
           pomoSessionsCount.textContent = pomoSessions;
+          syncToCloud();
           alert('Tebrikler! 25 dakikalık odak seansını başarıyla tamamladın! 🍅 Şimdi kısa bir mola ver.');
         } else {
           alert('Mola bitti! Yeni bir odak seansına hazır mısın? 🚀');
@@ -857,6 +903,92 @@ function applyImportedData(data) {
   }
   renderPlanner();
   renderNotes();
+}
+
+// ================= GOOGLE GİRİŞİ VE CANLI SENKRONİZASYON =================
+const loginBtn = document.querySelector('#loginBtn');
+const userPill = document.querySelector('#userPill');
+const userAvatar = document.querySelector('#userAvatar');
+const userName = document.querySelector('#userName');
+const logoutBtn = document.querySelector('#logoutBtn');
+
+if (auth && loginBtn) {
+  loginBtn.addEventListener('click', () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider).catch((error) => {
+      if (error.code === 'auth/popup-blocked' || error.code === 'auth/popup-closed-by-user') {
+        auth.signInWithRedirect(provider);
+      } else {
+        alert('Giriş yapılamadı: ' + error.message);
+      }
+    });
+  });
+
+  logoutBtn.addEventListener('click', () => {
+    if (confirm('Google hesabından çıkış yapmak istiyor musun?')) {
+      if (unsubscribeFirestore) {
+        unsubscribeFirestore();
+        unsubscribeFirestore = null;
+      }
+      auth.signOut().then(() => {
+        currentUser = null;
+      });
+    }
+  });
+
+  auth.onAuthStateChanged((user) => {
+    currentUser = user;
+    if (user) {
+      loginBtn.style.display = 'none';
+      userPill.style.display = 'inline-flex';
+      userName.textContent = user.displayName ? user.displayName.split(' ')[0] : 'Kullanıcı';
+      if (user.photoURL) {
+        userAvatar.src = user.photoURL;
+      }
+
+      // Canlı Bulut Dinleyicisi (Realtime sync)
+      if (unsubscribeFirestore) unsubscribeFirestore();
+
+      unsubscribeFirestore = db.collection('users').doc(user.uid).onSnapshot((doc) => {
+        if (doc.exists) {
+          const data = doc.data();
+          let needsReRender = false;
+          if (data.lessons && Array.isArray(data.lessons)) {
+            lessons = data.lessons;
+            localStorage.setItem(storageKeyLessons, JSON.stringify(lessons));
+            needsReRender = true;
+          }
+          if (data.notes && Array.isArray(data.notes)) {
+            notes = data.notes;
+            localStorage.setItem(storageKeyNotes, JSON.stringify(notes));
+            needsReRender = true;
+          }
+          if (typeof data.pomoSessions === 'number') {
+            pomoSessions = data.pomoSessions;
+            localStorage.setItem(storageKeyPomo, pomoSessions.toString());
+            pomoSessionsCount.textContent = pomoSessions;
+          }
+          if (needsReRender) {
+            renderPlanner();
+            renderNotes();
+            updatePomoTaskSelect();
+          }
+        } else {
+          // İlk kez giriş yapılıyorsa cihazdaki mevcut veriyi buluta ilk yedek olarak gönder
+          syncToCloud();
+        }
+      }, (err) => {
+        console.warn('Firestore dinleme hatası:', err);
+      });
+    } else {
+      loginBtn.style.display = 'inline-flex';
+      userPill.style.display = 'none';
+      if (unsubscribeFirestore) {
+        unsubscribeFirestore();
+        unsubscribeFirestore = null;
+      }
+    }
+  });
 }
 
 // ================= SERVICE WORKER KAYDI (PWA / MOBİL) =================
